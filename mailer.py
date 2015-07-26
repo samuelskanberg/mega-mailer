@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 import sys
 import smtplib
+import csv
 
 def get_credential_from_file():
     with open('credentials.txt') as f:
@@ -35,20 +36,36 @@ def get_subject_and_body_from_files():
     return subject, body
 
 def send_email(gmail_email, gmail_password, from_email, to_email, subject, body):
-
+    print "Sending to: "+to_email
     # Prepare actual message
     message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-    """ % (from_email, ", ".join(to_email), subject, body)
+    """ % (from_email, ", ".join([to_email]), subject, body)
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587) #or port 465 doesn't seem to work!
         server.ehlo()
         server.starttls()
         server.login(gmail_email, gmail_password)
-        server.sendmail(from_email, to_email, message)
+        server.sendmail(from_email, [to_email], message)
         server.close()
         print 'successfully sent the mail'
     except:
         print "failed to send mail"
+
+def get_emails_and_names_from_file():
+    email_dict = {}
+    with open('email_list.csv', 'rb') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader: 
+            name = row['name']
+            email = row['email']
+            email_dict[email] = name
+            
+
+    return email_dict
+
+
+emails = get_emails_and_names_from_file()
+print emails
 
 gmail_email, gmail_password = get_credential_from_file()
 
@@ -62,9 +79,8 @@ print 'body = ' + body
 
 #sys.exit(1)
 
-
-
-
-to_email = ['samuel.skanberg@gmail.com']
-send_email(gmail_email, gmail_password, gmail_email, to_email, subject, body)
+for email, name in emails.iteritems():
+    print "---------------------------------------"
+    formatted_body = body.replace("<name>", name)
+    send_email(gmail_email, gmail_password, gmail_email, email, subject, formatted_body)
 
