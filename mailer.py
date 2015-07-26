@@ -75,14 +75,25 @@ print '------------------------------'
 print 'subject = ' + subject
 print '------------------------------'
 print 'body = ' + body
-print '------------------------------'
+print '------------------------------\n\n'
 
 emails = get_emails_and_names_from_file()
-print emails
+
+response = raw_input('Do you want to preview all emails? (Y/N): ')
+
+if response.lower().strip() == "y":
+    for email, name in emails.iteritems():
+        print "---------------------------------------"
+        formatted_body = body.replace("<name>", name)
+        print 'Sending to email: '+email
+        print 'Subject: '+subject
+        print 'Body: '
+        print formatted_body
+
+    print "--------- END OF PREVIEW -----------\n\n"
 
 response = raw_input('Do you want to send to all emails? (Y/N): ')
 
-print response
 if response.lower().strip() == "y":
     for email, name in emails.iteritems():
         print "---------------------------------------"
