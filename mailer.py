@@ -13,7 +13,6 @@ def get_credential_from_file():
 
     for line in content:
         words = line.split(":")
-        print words
         if words[0] == 'gmail_email':
             gmail_email = words[1].strip()
         elif words[0] == 'gmail_password':
@@ -26,7 +25,7 @@ def get_subject_and_body_from_files():
     with open('subject.txt') as f:
         subject_content = f.readlines()
 
-    subject = subject_content[0]
+    subject = subject_content[0].strip()
 
     with open('body.txt') as f:
         body_content = f.readlines()
@@ -47,9 +46,9 @@ def send_email(gmail_email, gmail_password, from_email, to_email, subject, body)
         server.login(gmail_email, gmail_password)
         server.sendmail(from_email, [to_email], message)
         server.close()
-        print 'successfully sent the mail'
+        print 'Successfully sent the mail'
     except:
-        print "failed to send mail"
+        print "Failed to send mail"
 
 def get_emails_and_names_from_file():
     email_dict = {}
@@ -64,23 +63,31 @@ def get_emails_and_names_from_file():
     return email_dict
 
 
-emails = get_emails_and_names_from_file()
-print emails
-
 gmail_email, gmail_password = get_credential_from_file()
 
+print '------------------------------'
 print 'email = ' + gmail_email
 print 'password = ' + gmail_password
 
 subject, body = get_subject_and_body_from_files()
 
+print '------------------------------'
 print 'subject = ' + subject
+print '------------------------------'
 print 'body = ' + body
+print '------------------------------'
 
-#sys.exit(1)
+emails = get_emails_and_names_from_file()
+print emails
 
-for email, name in emails.iteritems():
-    print "---------------------------------------"
-    formatted_body = body.replace("<name>", name)
-    send_email(gmail_email, gmail_password, gmail_email, email, subject, formatted_body)
+response = raw_input('Do you want to send to all emails? (Y/N): ')
+
+print response
+if response.lower().strip() == "y":
+    for email, name in emails.iteritems():
+        print "---------------------------------------"
+        formatted_body = body.replace("<name>", name)
+        send_email(gmail_email, gmail_password, gmail_email, email, subject, formatted_body)
+else:
+    print "Aborting..."
 
